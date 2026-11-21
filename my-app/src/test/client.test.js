@@ -37,7 +37,7 @@ test("concurrent expired requests share one refresh and retry with the new token
     if (url.endsWith("/refresh")) return response(200, { accessToken: "new" });
     return options.headers.Authorization === "Bearer old" ? response(401, {}) : response(200, []);
   });
-  await Promise.all([request("/backend_service/api/v1/products"), request("/backend_service/api/v1/products")]);
+  await Promise.all([request("/product_service/api/v1/products"), request("/product_service/api/v1/products")]);
   expect(fetch.mock.calls.filter(([url]) => url.endsWith("/refresh"))).toHaveLength(1);
   expect(fetch.mock.calls.filter(([, options]) => options.headers.Authorization === "Bearer new")).toHaveLength(2);
 });
@@ -46,7 +46,7 @@ test("invalid refresh ends the session without retry loops", async () => {
   fetch.mockResolvedValueOnce(response(200, { accessToken: "old" }));
   await accountApi.login("demo", "password");
   fetch.mockResolvedValueOnce(response(401, {})).mockResolvedValueOnce(response(401, {}));
-  await expect(request("/backend_service/api/v1/products")).rejects.toMatchObject({ status: 401 });
+  await expect(request("/product_service/api/v1/products")).rejects.toMatchObject({ status: 401 });
   expect(getAccessToken()).toBeNull();
   expect(fetch).toHaveBeenCalledTimes(3);
 });
@@ -57,7 +57,7 @@ test("a second 401 after refresh stops instead of refreshing repeatedly", async 
   fetch.mockResolvedValueOnce(response(401, {}))
     .mockResolvedValueOnce(response(200, { accessToken: "new" }))
     .mockResolvedValueOnce(response(401, {}));
-  await expect(request("/backend_service/api/v1/products")).rejects.toMatchObject({ status: 401 });
+  await expect(request("/product_service/api/v1/products")).rejects.toMatchObject({ status: 401 });
   expect(fetch).toHaveBeenCalledTimes(4);
   expect(getAccessToken()).toBeNull();
 });
@@ -66,7 +66,7 @@ test("403 does not trigger a refresh", async () => {
   fetch.mockResolvedValueOnce(response(200, { accessToken: "old" }));
   await accountApi.login("demo", "password");
   fetch.mockResolvedValueOnce(response(403, {}));
-  await expect(request("/backend_service/api/v1/products")).rejects.toMatchObject({ status: 403 });
+  await expect(request("/product_service/api/v1/products")).rejects.toMatchObject({ status: 403 });
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(getAccessToken()).toBe("old");
 });

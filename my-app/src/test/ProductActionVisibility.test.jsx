@@ -44,7 +44,7 @@ test("an unauthorized delete still calls the API and shows its 403 message", asy
   fireEvent.click(screen.getByRole("button", { name: "Delete" }));
 
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(forbiddenBody.message));
-  expect(fetch.mock.calls[1][0]).toBe("/backend_service/api/v1/products/1");
+  expect(fetch.mock.calls[1][0]).toBe("/product_service/api/v1/products/1");
   expect(fetch.mock.calls[1][1].method).toBe("DELETE");
   expect(screen.getByText("Notebook")).toBeInTheDocument();
 });
@@ -59,6 +59,6 @@ test("an unauthorized create still calls the API and shows its 403 message", asy
   fireEvent.click(screen.getByRole("button", { name: "Create", exact: true }));
 
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(forbiddenBody.message));
-  expect(fetch.mock.calls[1][0]).toBe("/backend_service/api/v1/products");
+  expect(fetch.mock.calls[1][0]).toBe("/product_service/api/v1/products");
   expect(fetch.mock.calls[1][1].method).toBe("POST");
 });

@@ -1,6 +1,6 @@
 import { request } from "./client";
 
-const baseUrl = import.meta.env.VITE_PHONE_IMPORT_API_URL || "/api/phones/imports";
+const baseUrl = "/inventory_service/api/v1/phones/imports";
 
 async function call(path, options) {
   const response = await request(`${baseUrl}${path}`, options);

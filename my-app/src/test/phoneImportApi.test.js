@@ -17,7 +17,7 @@ test("multipart upload survives token refresh without a JSON content type", asyn
   await expect(phoneImportApi.upload(file, "CREATE")).resolves.toEqual({ importId: 5, jobExecutionId: 6 });
   const first = fetch.mock.calls[1];
   const retry = fetch.mock.calls[3];
-  expect(first[0]).toBe("/api/phones/imports");
+  expect(first[0]).toBe("/inventory_service/api/v1/phones/imports");
   expect(first[1].body.get("file")).toBe(file);
   expect(first[1].body.get("mode")).toBe("CREATE");
   expect(first[1].headers["Content-Type"]).toBeUndefined();

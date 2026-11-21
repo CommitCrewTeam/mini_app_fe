@@ -1,5 +1,5 @@
 import { request } from "./client";
-const baseUrl = "/backend_service/api/v1/products";
+const baseUrl = "/product_service/api/v1/products";
 export const productApi = {
   list: signal => request(baseUrl, { signal }),
   create: body => request(baseUrl, { method: "POST", body }),
