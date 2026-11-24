@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { phoneImportApi } from "../api/phoneImports";
 
-const running = new Set(["PENDING", "VALIDATING", "APPROVING"]);
+const running = new Set(["UPLOAD_IN_PROGRESS", "VALIDATE_IN_PROGRESS", "APPROVE_IN_PROGRESS"]);
 const statusColors = {
-  DONE: "success", VALIDATED: "success", FAILED: "danger",
-  PENDING: "warning", VALIDATING: "warning", APPROVING: "warning",
+  APPROVE_SUCCEEDED: "success", VALIDATE_SUCCEEDED: "success",
+  UPLOAD_FAILED: "danger", VALIDATE_FAILED: "danger", APPROVE_FAILED: "danger", APPROVE_VALIDATION_FAILED: "danger",
+  UPLOAD_IN_PROGRESS: "warning", VALIDATE_IN_PROGRESS: "warning", APPROVE_IN_PROGRESS: "warning",
 };
 
 export default function PhoneImports() {
@@ -57,16 +58,16 @@ export default function PhoneImports() {
     try {
       if (action === "upload") {
         const submission = await phoneImportApi.upload(file, mode);
-        setImportId(String(submission.importId));
-        setLookup(String(submission.importId));
-        setJob(submission.jobExecutionId);
+        setImportId(String(submission));
+        setLookup(String(submission));
+        setJob(null);
         setStat(null);
         setUpdatedAt(null);
-        setNotice(`Đã nhận import #${submission.importId}. File đang được xử lý.`);
+        setNotice(`Đã nhận import #${submission}. File đang được xử lý.`);
       } else {
-        const submission = await phoneImportApi[action](importId);
-        setJob(action === "validate" ? submission : submission.jobExecutionId);
-        setStat(current => ({ ...current, status: action === "validate" ? "VALIDATING" : "APPROVING" }));
+        await phoneImportApi[action](importId);
+        setJob(null);
+        setStat(current => ({ ...current, status: action === "validate" ? "VALIDATE_IN_PROGRESS" : "APPROVE_IN_PROGRESS" }));
         setNotice(action === "validate" ? "Đã gửi yêu cầu kiểm tra dữ liệu." : "Đã gửi yêu cầu duyệt import.");
       }
     } catch (err) {
@@ -105,8 +106,7 @@ export default function PhoneImports() {
   const actionsDisabled = !!busy || loading || !!error;
   return <div className="space-y-6">
     <section className="panel">
-      <h2 className="text-lg font-semibold">Import điện thoại</h2>
-      <p className="mt-1 mb-6 text-[var(--color-text-secondary)]">Tải file CSV để tạo mới, cập nhật hoặc nhập thêm tồn kho điện thoại.</p>
+      <p className="mt-1 mb-6 text-[var(--color-text-secondary)]">Tải file CSV để tạo mới, cập nhật hoặc nhập thêm tồn kho product.</p>
       <form onSubmit={upload} className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <label className="flex flex-col gap-2">File CSV
@@ -157,11 +157,11 @@ export default function PhoneImports() {
           {running.has(stat.status) && !error && "Tự cập nhật mỗi 3 giây khi job đang chạy."}
         </p>
         <div className="flex gap-2">
-          <button className="action-button" disabled={actionsDisabled || stat.status !== "READY"} onClick={() => submit("validate")}>{busy === "validate" ? "Đang gửi…" : "Validate"}</button>
-          <button className="action-button" disabled={actionsDisabled || !["READY", "VALIDATED"].includes(stat.status)} onClick={() => submit("approve")}>{busy === "approve" ? "Đang gửi…" : "Approve"}</button>
+          <button className="action-button" disabled={actionsDisabled || !["VALIDATE_SUCCEEDED", "VALIDATE_FAILED", "APPROVE_VALIDATION_FAILED"].includes(stat.status)} onClick={() => submit("validate")}>{busy === "validate" ? "Đang gửi…" : "Validate"}</button>
+          <button className="action-button" disabled={actionsDisabled || !["VALIDATE_SUCCEEDED"].includes(stat.status)} onClick={() => submit("approve")}>{busy === "approve" ? "Đang gửi…" : "Approve"}</button>
         </div>
       </div>}
-      <p className="mt-4 text-xs text-[var(--color-text-secondary)]">Validate khi READY. Approve khi READY hoặc VALIDATED. DONE và FAILED là trạng thái kết thúc.</p>
+      <p className="mt-4 text-xs text-[var(--color-text-secondary)]">Sau khi sửa draft, bấm Validate để kiểm tra lại. Chỉ approve khi VALIDATE_SUCCEEDED. Xác nhận áp dụng các dòng cảnh báo tại danh sách import.</p>
     </section>
   </div>;
 }

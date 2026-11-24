@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { usePermissions } from "../../context/PermissionContext";
 import { useState } from "react";
 const items = [
-  { to: "/", label: "Import điện thoại", icon: Upload },
+  { to: "/", label: "Product Import", icon: Upload },
   { to: "/account", label: "My account", icon: User },
   { to: "/change-password", label: "Change password", icon: KeyRound },
   { to: "/tokens", label: "Quản lý token", icon: Monitor, permission: "tokens:read" },

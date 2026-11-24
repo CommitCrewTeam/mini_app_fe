@@ -7,7 +7,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import { TokenRefreshNotifications } from "./components/common/TokenSessionStatus";
 import Products from "./pages/Products";
-import PhoneImports from "./pages/PhoneImports";
+import ImportScreen from "./pages/ImportScreen";
 import Authorization from "./pages/Authorization";
 import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
@@ -23,8 +23,7 @@ export default function App() {
     <Route path="/register" element={<Register />} />
     <Route element={<PrivateRoute />}><Route element={<DashboardLayout />}>
       <Route path="/account" element={<Account />} />
-      <Route path="/" element={<PhoneImports />} />
-      <Route path="/phone-imports" element={<Navigate to="/" replace />} />
+      <Route path="/" element={<ImportScreen />} />
       <Route path="/change-password" element={<ChangePassword />} />
       <Route element={<PermissionRoute permission="tokens:read" />}>
         <Route path="/tokens" element={<TokenPage />} />
