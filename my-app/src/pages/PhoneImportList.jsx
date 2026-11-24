@@ -103,9 +103,10 @@ export default function PhoneImportList() {
 
     <div className="overflow-x-auto">
       <table className="data-table">
-        <thead><tr><th>Import ID</th><th>Mode</th><th>Trạng thái</th><th>Version</th><th>Error</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
+        <thead><tr><th>Import ID</th><th>File upload</th><th>Mode</th><th>Trạng thái</th><th>Version</th><th>Error</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
         <tbody>{imports.map(item => <tr key={item.id}>
           <td>{item.id}</td>
+          <td className="max-w-64 truncate" title={item.uploadFileName || ""}>{item.uploadFileName || "—"}</td>
           <td>{item.mode}</td>
           <td><span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: `var(--color-${statusColors[item.status] || "user"}-bg)`, color: `var(--color-${statusColors[item.status] || "user"}-text)` }}>{item.status}</span></td>
           <td>{item.version ?? ""}</td>

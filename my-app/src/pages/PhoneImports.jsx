@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { phoneImportApi } from "../api/phoneImports";
+import PhoneImportDetail from "../components/PhoneImportDetail";
 
 const running = new Set(["UPLOAD_IN_PROGRESS", "VALIDATE_IN_PROGRESS", "APPROVE_IN_PROGRESS"]);
 const statusColors = {
@@ -13,6 +14,7 @@ export default function PhoneImports() {
   const [mode, setMode] = useState("CREATE");
   const [lookup, setLookup] = useState("");
   const [importId, setImportId] = useState("");
+  const [viewId, setViewId] = useState(null);
   const [job, setJob] = useState(null);
   const [stat, setStat] = useState(null);
   const [error, setError] = useState("");
@@ -140,15 +142,19 @@ export default function PhoneImports() {
           <button type="button" className="action-button" disabled={!!busy || loading || !importId} onClick={() => { setError(""); setReload(value => value + 1); }}>Tải lại</button>
         </form>
       </div>
-      {importId && <p className="mb-3 text-sm">Import #{importId}{job != null && ` · Job execution #${job}`}</p>}
+      {importId && <div className="mb-3 flex flex-wrap items-center gap-3">
+        <p className="text-sm">Import #{importId}{job != null && ` · Job execution #${job}`}</p>
+        <button type="button" className="action-button" disabled={!stat} onClick={() => setViewId(importId)}>Xem chi tiết</button>
+      </div>}
       <div className="overflow-x-auto">
         <table className="data-table">
-          <thead><tr><th>Import ID</th><th>Mode</th><th>Trạng thái</th><th>Tổng dòng</th><th>Hợp lệ</th><th>Lỗi</th></tr></thead>
+          <thead><tr><th>Import ID</th><th>Mode</th><th>Trạng thái</th><th>Tên file</th><th>Tổng dòng</th><th>Hợp lệ</th><th>Lỗi</th></tr></thead>
           <tbody>{stat ? <tr>
             <td>{importId}</td><td>{stat.mode}</td>
             <td><span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: `var(--color-${statusColors[stat.status] || "user"}-bg)`, color: `var(--color-${statusColors[stat.status] || "user"}-text)` }}>{stat.status}</span></td>
+            <td className="max-w-64 truncate" title={stat.upload_file_name || ""}>{stat.upload_file_name || ""}</td>
             <td>{stat.total_count}</td><td>{stat.valid_count}</td><td>{stat.fail_count}</td>
-          </tr> : <tr><td colSpan={6} className="text-center text-[var(--color-text-secondary)]">{loading ? "Đang tải thống kê…" : "Chưa có thống kê. Tải file hoặc nhập Import ID để tra cứu."}</td></tr>}</tbody>
+          </tr> : <tr><td colSpan={7} className="text-center text-[var(--color-text-secondary)]">{loading ? "Đang tải thống kê…" : "Chưa có thống kê. Tải file hoặc nhập Import ID để tra cứu."}</td></tr>}</tbody>
         </table>
       </div>
       {stat && <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
@@ -162,6 +168,7 @@ export default function PhoneImports() {
         </div>
       </div>}
       <p className="mt-4 text-xs text-[var(--color-text-secondary)]">Sau khi sửa draft, bấm Validate để kiểm tra lại. Chỉ approve khi VALIDATE_SUCCEEDED. Xác nhận áp dụng các dòng cảnh báo tại danh sách import.</p>
+      {viewId !== null && <PhoneImportDetail key={viewId} importId={viewId} onClose={() => { setViewId(null); setReload(value => value + 1); }} />}
     </section>
   </div>;
 }

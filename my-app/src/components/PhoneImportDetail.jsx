@@ -89,6 +89,7 @@ export default function PhoneImportDetail({ importId, onClose }) {
     {header && <>
       <dl className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
         <div><dt>Import ID</dt><dd>{header.id}</dd></div>
+        <div className="col-span-2 break-words"><dt>File upload</dt><dd>{header.uploadFileName || "—"}</dd></div>
         <div><dt>Trạng thái</dt><dd><Status value={header.status} /></dd></div>
         <div><dt>Version</dt><dd>{header.version ?? "—"}</dd></div>
         <div><dt>Ngày tạo</dt><dd>{date(header.createdAt)}</dd></div>
